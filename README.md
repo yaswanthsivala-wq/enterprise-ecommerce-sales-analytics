@@ -47,3 +47,19 @@ The platform enables businesses to analyze:
 **Version Control**
 - Git
 - GitHub
+
+---
+
+## 📊 Dashboard Screenshots
+
+### Executive Dashboard
+![Executive Dashboard](screenshots/executive_dashboard.png)
+
+### Sales Dashboard
+![Sales Dashboard](screenshots/sales_dashboard.png)
+
+### Product Dashboard
+![Product Dashboard](screenshots/product_dashboard.png)
+
+### Customer Dashboard
+![Customer Dashboard](screenshots/customer_dashboard.png)
