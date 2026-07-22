@@ -163,3 +163,56 @@ E-Commerce Data Generation
 - **Database Layer:** Stores structured customer, product, and order information.
 - **SQL Analytics:** Calculates business KPIs and analytical metrics.
 - **Visualization Layer:** Provides interactive dashboards using Streamlit and Plotly.
+
+---
+
+## 🗄️ Database Schema
+
+The platform uses a relational PostgreSQL data model designed for ecommerce analytics.
+
+```mermaid
+erDiagram
+
+    CUSTOMERS ||--o{ ORDERS : places
+
+    ORDERS ||--o{ ORDER_ITEMS : contains
+
+    PRODUCTS ||--o{ ORDER_ITEMS : includes
+
+
+    CUSTOMERS {
+        int customer_id PK
+        varchar first_name
+        varchar last_name
+        varchar email
+        varchar country
+        timestamp created_at
+    }
+
+
+    ORDERS {
+        int order_id PK
+        int customer_id FK
+        timestamp order_date
+        double_precision total_amount
+        varchar status
+    }
+
+
+    ORDER_ITEMS {
+        int order_item_id PK
+        int order_id FK
+        int product_id FK
+        int quantity
+        double_precision price
+    }
+
+
+    PRODUCTS {
+        int product_id PK
+        varchar product_name
+        varchar category
+        double_precision price
+        int inventory
+    }
+```
