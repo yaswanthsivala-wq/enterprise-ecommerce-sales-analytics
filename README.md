@@ -27,24 +27,24 @@ The platform enables businesses to analyze:
 
 ## 🛠️ Technology Stack
 
-**Programming**
+### Programming
 - Python
 
-**Database**
+### Database
 - PostgreSQL
 - Supabase
 
-**Data Engineering**
+### Data Engineering
 - ETL Pipeline
 - Pandas
 - SQLAlchemy
 
-**Analytics & Visualization**
+### Analytics & Visualization
 - SQL
 - Streamlit
 - Plotly
 
-**Version Control**
+### Version Control
 - Git
 - GitHub
 
@@ -53,39 +53,74 @@ The platform enables businesses to analyze:
 ## 📊 Dashboard Screenshots
 
 ### Executive Dashboard
+
 ![Executive Dashboard](screenshots/executive_dashboard.png)
 
+Provides high-level business KPIs including:
+- Total Revenue
+- Total Orders
+- Average Order Value
+- Revenue Trends
+- Business Performance Overview
+
+
 ### Sales Dashboard
+
 ![Sales Dashboard](screenshots/sales_dashboard.png)
 
+Analyzes:
+- Revenue trends over time
+- Sales performance
+- Geographic revenue distribution
+- Order patterns
+
+
 ### Product Dashboard
+
 ![Product Dashboard](screenshots/product_dashboard.png)
 
+Provides insights into:
+- Product performance
+- Category-level revenue analysis
+- Top-performing products
+- Product contribution to sales
+
+
 ### Customer Dashboard
+
 ![Customer Dashboard](screenshots/customer_dashboard.png)
+
+Analyzes:
+- Customer purchasing behavior
+- Customer segmentation
+- VIP customers
+- High-value customer analysis
+
+
+---
 
 ## 📁 Project Structure
 
-
+```text
 enterprise-ecommerce-sales-analytics/
 
 │
 ├── data/
-│ └── ecommerce_data.csv
-
+│   └── ecommerce_data.csv
+│
 ├── screenshots/
-│ ├── executive_dashboard.png
-│ ├── sales_dashboard.png
-│ ├── product_dashboard.png
-│ └── customer_dashboard.png
-
+│   ├── executive_dashboard.png
+│   ├── sales_dashboard.png
+│   ├── product_dashboard.png
+│   └── customer_dashboard.png
+│
 ├── app.py
 ├── database.py
 ├── etl_pipeline.py
 ├── requirements.txt
 ├── README.md
 └── .gitignore
-
+```
 
 ### File Description
 
@@ -94,3 +129,37 @@ enterprise-ecommerce-sales-analytics/
 - **etl_pipeline.py** → Data generation, cleaning, and loading process
 - **requirements.txt** → Required Python libraries
 - **screenshots/** → Dashboard images for documentation
+
+---
+
+## 🏗️ System Architecture
+
+The platform follows an end-to-end analytics workflow:
+
+```text
+E-Commerce Data Generation
+            |
+            ↓
+        ETL Pipeline
+(Python + Pandas + SQLAlchemy)
+            |
+            ↓
+    PostgreSQL Database
+(Customers | Products | Orders)
+            |
+            ↓
+    SQL Analytics Layer
+(Business Metrics & KPIs)
+            |
+            ↓
+ Streamlit + Plotly Dashboard
+(Executive | Sales | Product | Customer)
+```
+
+### Data Flow Explanation
+
+- **Data Generation:** Creates realistic ecommerce transaction data.
+- **ETL Pipeline:** Cleans, transforms, and loads data into PostgreSQL.
+- **Database Layer:** Stores structured customer, product, and order information.
+- **SQL Analytics:** Calculates business KPIs and analytical metrics.
+- **Visualization Layer:** Provides interactive dashboards using Streamlit and Plotly.
