@@ -280,3 +280,88 @@ def get_product_kpis():
         query,
         engine
     )
+def get_customer_kpis():
+    
+    query = """
+    SELECT
+        COUNT(DISTINCT c.customer_id) AS total_customers,
+        SUM(o.total_amount) AS total_revenue,
+        AVG(customer_total.total_spent) AS avg_customer_value
+    FROM customers c
+    JOIN orders o
+        ON c.customer_id = o.customer_id
+    JOIN (
+        SELECT
+            customer_id,
+            SUM(total_amount) AS total_spent
+        FROM orders
+        GROUP BY customer_id
+    ) customer_total
+        ON c.customer_id = customer_total.customer_id;
+    """
+
+    return pd.read_sql(
+        query,
+        engine
+    )
+def get_top_customers(limit=10):
+    
+    query = f"""
+    SELECT
+        c.first_name,
+        c.last_name,
+        c.country,
+        SUM(o.total_amount) AS total_spent
+    FROM customers c
+    JOIN orders o
+        ON c.customer_id = o.customer_id
+    GROUP BY
+        c.first_name,
+        c.last_name,
+        c.country
+    ORDER BY total_spent DESC
+    LIMIT {limit};
+    """
+
+    return pd.read_sql(
+        query,
+        engine
+    )
+def get_customer_segments():
+    
+    query = """
+    SELECT
+        c.first_name,
+        c.last_name,
+        c.country,
+        SUM(o.total_amount) AS total_spent,
+        CASE
+            WHEN SUM(o.total_amount) >= 5000
+                THEN 'VIP Customer'
+
+            WHEN SUM(o.total_amount) >= 2000
+                THEN 'High Value Customer'
+
+            WHEN SUM(o.total_amount) >= 500
+                THEN 'Regular Customer'
+
+            ELSE 'Low Value Customer'
+        END AS customer_segment
+
+    FROM customers c
+
+    JOIN orders o
+        ON c.customer_id = o.customer_id
+
+    GROUP BY
+        c.first_name,
+        c.last_name,
+        c.country
+
+    ORDER BY total_spent DESC;
+    """
+
+    return pd.read_sql(
+        query,
+        engine
+    )
