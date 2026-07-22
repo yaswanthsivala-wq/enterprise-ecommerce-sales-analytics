@@ -1,0 +1,12 @@
+product_id,product_name,category,price
+1,Laptop,Electronics,920
+2,Smartphone,Electronics,631
+3,Tablet,Electronics,1211
+4,Monitor,Electronics,207
+5,Keyboard,Accessories,407
+6,Mouse,Accessories,329
+7,Headphones,Accessories,343
+8,Charger,Accessories,453
+9,Chair,Home,628
+10,Desk,Home,584
+11,Lamp,Home,1108
