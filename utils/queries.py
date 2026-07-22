@@ -242,3 +242,41 @@ def get_filtered_sales(country="All", category="All"):
         query,
         engine
     )
+
+def get_top_products():
+    
+    query = """
+    SELECT
+        p.product_name,
+        p.category,
+        SUM(oi.quantity) AS units_sold,
+        SUM(oi.quantity * oi.price) AS revenue
+    FROM products p
+    JOIN order_items oi
+        ON p.product_id = oi.product_id
+    GROUP BY
+        p.product_name,
+        p.category
+    ORDER BY revenue DESC;
+    """
+
+    return pd.read_sql(
+        query,
+        engine
+    )
+def get_product_kpis():
+    
+    query = """
+    SELECT
+        COUNT(DISTINCT p.product_id) AS total_products,
+        SUM(oi.quantity) AS units_sold,
+        SUM(oi.quantity * oi.price) AS total_revenue
+    FROM products p
+    JOIN order_items oi
+        ON p.product_id = oi.product_id;
+    """
+
+    return pd.read_sql(
+        query,
+        engine
+    )
