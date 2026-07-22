@@ -1,6 +1,9 @@
 import streamlit as st
 
-from dashboard.pages.home_dashboard import show_home
+from dashboard.pages.executive_dashboard import show_executive
+from dashboard.pages.sales_dashboard import show_sales
+from dashboard.pages.customer_dashboard import show_customer
+from dashboard.pages.product_dashboard import show_product
 
 
 st.set_page_config(
@@ -9,46 +12,26 @@ st.set_page_config(
     layout="wide"
 )
 
-
 st.sidebar.title("📊 Navigation")
-
 
 page = st.sidebar.radio(
     "Select Dashboard",
     [
-        "Home",
+        "Executive Dashboard",
         "Sales Dashboard",
         "Customer Dashboard",
         "Product Dashboard"
     ]
 )
 
-
-
-if page == "Home":
-
-    show_home()
-
-
+if page == "Executive Dashboard":
+    show_executive()
 
 elif page == "Sales Dashboard":
-
-    from dashboard.pages.sales_dashboard import show_sales
-
     show_sales()
 
-
-
 elif page == "Customer Dashboard":
-
-    from dashboard.pages.customer_dashboard import show_customer
-
     show_customer()
 
-
-
 elif page == "Product Dashboard":
-
-    from dashboard.pages.product_dashboard import show_product
-
     show_product()
