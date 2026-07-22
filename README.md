@@ -63,3 +63,34 @@ The platform enables businesses to analyze:
 
 ### Customer Dashboard
 ![Customer Dashboard](screenshots/customer_dashboard.png)
+
+## 📁 Project Structure
+
+
+enterprise-ecommerce-sales-analytics/
+
+│
+├── data/
+│ └── ecommerce_data.csv
+
+├── screenshots/
+│ ├── executive_dashboard.png
+│ ├── sales_dashboard.png
+│ ├── product_dashboard.png
+│ └── customer_dashboard.png
+
+├── app.py
+├── database.py
+├── etl_pipeline.py
+├── requirements.txt
+├── README.md
+└── .gitignore
+
+
+### File Description
+
+- **app.py** → Streamlit dashboard application
+- **database.py** → PostgreSQL database connection setup
+- **etl_pipeline.py** → Data generation, cleaning, and loading process
+- **requirements.txt** → Required Python libraries
+- **screenshots/** → Dashboard images for documentation
