@@ -217,3 +217,15 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 .streamlit/
+# Generated datasets
+*.csv
+
+# Local database files
+*.sqlite
+*.db
+
+# Environment variables
+.env
+
+# Streamlit secrets
+.streamlit/secrets.toml

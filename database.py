@@ -13,8 +13,7 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 
 
 if not DATABASE_URL:
-    raise Exception("❌ DATABASE_URL not found in .env")
-
+    raise ValueError("DATABASE_URL environment variable not found in .env")
 
 # Create database engine
 engine = create_engine(
@@ -58,6 +57,6 @@ def test_connection():
 
 
 
-# Run test
+# Run the connection test when executed directly
 if __name__ == "__main__":
     test_connection()

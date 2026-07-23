@@ -4,25 +4,45 @@ import os
 # Add project root to Python path
 sys.path.append(
     os.path.dirname(
-        os.path.dirname(os.path.abspath(__file__))
+        os.path.dirname(
+            os.path.abspath(__file__)
+        )
     )
 )
+
 
 from sqlalchemy.orm import Session
 
 from database import SessionLocal
 from models import Customer, Product, Order, OrderItem
+
 from etl.transform import transform_data
+
 
 
 def load_data():
 
     print("Starting optimized data load...")
 
-    # Get transformed data
-    df = transform_data()
 
-    print(f"Total records: {len(df)}")
+    # ==========================================
+    # TRANSFORM DATA
+    # ==========================================
+
+    data = transform_data()
+
+
+    customer_df = data["customers"]
+    product_df = data["products"]
+    order_df = data["orders"]
+    order_item_df = data["order_items"]
+
+
+    print("Total records:")
+    print(f"Customers: {len(customer_df)}")
+    print(f"Products: {len(product_df)}")
+    print(f"Orders: {len(order_df)}")
+    print(f"Order Items: {len(order_item_df)}")
 
 
     db: Session = SessionLocal()
@@ -35,18 +55,7 @@ def load_data():
         # CUSTOMERS
         # ==========================================
 
-        customer_df = df.drop_duplicates(
-            subset=["customer_id"]
-        ).copy()
-
-
-        # Fix duplicate emails
-        customer_df["email"] = (
-            customer_df["email"]
-            .str.lower()
-            + "_"
-            + customer_df["customer_id"].astype(str)
-        )
+        print("Loading customers...")
 
 
         customers = []
@@ -59,13 +68,16 @@ def load_data():
                     customer_id=int(row["customer_id"]),
                     first_name=row["first_name"],
                     last_name=row["last_name"],
-                    email=row["email"],
+                    email=str(row["email"]).lower(),
                     country=row["country"]
                 )
             )
 
 
         db.bulk_save_objects(customers)
+
+        db.commit()
+
 
         print(
             f"✅ Customers loaded: {len(customers)}"
@@ -77,9 +89,8 @@ def load_data():
         # PRODUCTS
         # ==========================================
 
-        product_df = df.drop_duplicates(
-            subset=["product_id"]
-        )
+
+        print("Loading products...")
 
 
         products = []
@@ -93,12 +104,16 @@ def load_data():
                     product_name=row["product_name"],
                     category=row["category"],
                     price=float(row["price"]),
-                    inventory=0
+                    inventory=int(
+                        row.get("inventory",0)
+                    )
                 )
             )
 
 
         db.bulk_save_objects(products)
+
+        db.commit()
 
 
         print(
@@ -111,14 +126,18 @@ def load_data():
         # ORDERS
         # ==========================================
 
+
+        print("Loading orders...")
+
+
         orders = []
 
 
-        for index, row in df.iterrows():
+        for _, row in order_df.iterrows():
 
             orders.append(
                 Order(
-                    order_id=index + 1,
+                    order_id=int(row["order_id"]),
                     customer_id=int(row["customer_id"]),
                     order_date=row["order_date"],
                     total_amount=float(row["total_amount"]),
@@ -127,7 +146,11 @@ def load_data():
             )
 
 
-        db.bulk_save_objects(orders)
+        db.bulk_save_objects(
+            orders
+        )
+
+        db.commit()
 
 
         print(
@@ -140,15 +163,19 @@ def load_data():
         # ORDER ITEMS
         # ==========================================
 
+
+        print("Loading order items...")
+
+
         order_items = []
 
 
-        for index, row in df.iterrows():
+        for _, row in order_item_df.iterrows():
 
             order_items.append(
                 OrderItem(
-                    order_item_id=index + 1,
-                    order_id=index + 1,
+                    order_item_id=int(row["order_item_id"]),
+                    order_id=int(row["order_id"]),
                     product_id=int(row["product_id"]),
                     quantity=int(row["quantity"]),
                     price=float(row["price"])
@@ -156,7 +183,12 @@ def load_data():
             )
 
 
-        db.bulk_save_objects(order_items)
+        db.bulk_save_objects(
+            order_items
+        )
+
+
+        db.commit()
 
 
         print(
@@ -165,14 +197,10 @@ def load_data():
 
 
 
-        # Commit all changes
-
-        db.commit()
-
-
         print(
             "🎉 All data loaded successfully into Supabase!"
         )
+
 
 
     except Exception as e:
@@ -195,4 +223,5 @@ def load_data():
 
 
 if __name__ == "__main__":
+
     load_data()

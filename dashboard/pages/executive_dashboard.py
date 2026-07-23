@@ -8,77 +8,100 @@ from database import engine
 def show_executive():
 
     st.title("📊 Executive Dashboard")
-    st.markdown("### Enterprise E-Commerce Sales Analytics Platform")
+
+    st.markdown(
+        "### Enterprise E-Commerce Sales Analytics Platform"
+    )
 
 
-    # ============================
-    # SIDEBAR FILTERS
-    # ============================
+    # ==========================
+    # FILTERS
+    # ==========================
 
-    st.sidebar.header("🔎 Dashboard Filters")
+    st.sidebar.header(
+        "🔎 Dashboard Filters"
+    )
 
 
-    country_query = """
-    SELECT DISTINCT country
-    FROM customers
-    ORDER BY country;
-    """
-
-    countries_df = pd.read_sql(
-        country_query,
+    countries = pd.read_sql(
+        """
+        SELECT DISTINCT country
+        FROM customers
+        ORDER BY country;
+        """,
         engine
     )
+
+
+    categories = pd.read_sql(
+        """
+        SELECT DISTINCT category
+        FROM products
+        ORDER BY category;
+        """,
+        engine
+    )
+
 
     selected_country = st.sidebar.selectbox(
         "🌎 Country",
-        ["All"] + countries_df["country"].tolist()
-    )
-
-
-    category_query = """
-    SELECT DISTINCT category
-    FROM products
-    ORDER BY category;
-    """
-
-    categories_df = pd.read_sql(
-        category_query,
-        engine
+        ["All"] + countries["country"].tolist()
     )
 
 
     selected_category = st.sidebar.selectbox(
         "📦 Category",
-        ["All"] + categories_df["category"].tolist()
+        ["All"] + categories["category"].tolist()
     )
 
 
-    # ============================
+    # ==========================
     # MAIN QUERY
-    # ============================
+    # ==========================
+
 
     query = """
+
     SELECT
+
+        o.order_id,
         o.order_date,
+        o.status,
         o.total_amount,
+
+
+        c.customer_id,
         c.country,
+
+
+        oi.quantity,
+        oi.price,
+
+
         p.category,
-        p.product_name,
-        c.first_name,
-        c.last_name
+        p.product_name
+
 
     FROM orders o
 
+
     JOIN customers c
-    ON o.customer_id = c.customer_id
+
+        ON o.customer_id = c.customer_id
+
 
     JOIN order_items oi
-    ON o.order_id = oi.order_id
+
+        ON o.order_id = oi.order_id
+
 
     JOIN products p
-    ON oi.product_id = p.product_id
+
+        ON oi.product_id = p.product_id
+
 
     WHERE 1=1
+
     """
 
 
@@ -96,6 +119,7 @@ def show_executive():
         """
 
 
+
     df = pd.read_sql(
         query,
         engine
@@ -105,76 +129,105 @@ def show_executive():
     if df.empty:
 
         st.warning(
-            "No data available for selected filters."
+            "No data available"
         )
 
         return
 
 
-    # ============================
-    # KPI CARDS
-    # ============================
+
+    # ==========================
+    # REMOVE DUPLICATE ORDERS
+    # ==========================
 
 
-    total_revenue = df["total_amount"].sum()
+    orders = (
 
-    total_orders = df["total_amount"].count()
+        df[
+            [
+                "order_id",
+                "order_date",
+                "total_amount",
+                "customer_id",
+                "country",
+                "status"
+            ]
+
+        ]
+
+        .drop_duplicates()
+
+    )
+
+
+
+    # ==========================
+    # KPI
+    # ==========================
+
+
+    total_revenue = (
+        orders["total_amount"]
+        .sum()
+    )
+
+
+    total_orders = (
+        orders["order_id"]
+        .nunique()
+    )
+
 
     total_customers = (
-        df[
-            ["first_name", "last_name"]
-        ]
-        .drop_duplicates()
-        .shape[0]
+        orders["customer_id"]
+        .nunique()
     )
+
 
     avg_order_value = (
-        total_revenue / total_orders
+
+        total_revenue /
+        total_orders
+
     )
 
 
-    col1, col2, col3, col4 = st.columns(4)
+
+    col1,col2,col3,col4 = st.columns(4)
 
 
-    with col1:
-
-        st.metric(
-            "💰 Total Revenue",
-            f"${total_revenue:,.2f}"
-        )
+    col1.metric(
+        "💰 Total Revenue",
+        f"${total_revenue:,.2f}"
+    )
 
 
-    with col2:
-
-        st.metric(
-            "📦 Total Orders",
-            f"{total_orders:,}"
-        )
+    col2.metric(
+        "📦 Total Orders",
+        f"{total_orders:,}"
+    )
 
 
-    with col3:
-
-        st.metric(
-            "👥 Total Customers",
-            f"{total_customers:,}"
-        )
+    col3.metric(
+        "👥 Customers",
+        f"{total_customers:,}"
+    )
 
 
-    with col4:
+    col4.metric(
+        "🛒 Avg Order Value",
+        f"${avg_order_value:,.2f}"
+    )
 
-        st.metric(
-            "🛒 Average Order Value",
-            f"${avg_order_value:,.2f}"
-        )
 
 
     st.divider()
 
 
 
-    # ============================
-    # REVENUE TREND
-    # ============================
+    # ==========================
+    # MONTHLY REVENUE
+    # ==========================
 
 
     st.subheader(
@@ -182,30 +235,43 @@ def show_executive():
     )
 
 
-    df["month"] = (
-        pd.to_datetime(
-            df["order_date"]
-        )
-        .dt
-        .strftime("%b")
-    )
+    monthly = orders.copy()
 
 
-    monthly_revenue = (
-        df
+    monthly["month"] = pd.to_datetime(
+        monthly["order_date"]
+    ).dt.to_period("M").astype(str)
+
+
+
+    monthly_sales = (
+
+        monthly
+
         .groupby("month")
+
         ["total_amount"]
+
         .sum()
+
         .reset_index()
+
     )
+
 
 
     fig = px.line(
-        monthly_revenue,
+
+        monthly_sales,
+
         x="month",
+
         y="total_amount",
+
         markers=True,
-        title="Revenue Over Time"
+
+        title="Monthly Revenue"
+
     )
 
 
@@ -216,34 +282,50 @@ def show_executive():
 
 
 
-    # ============================
-    # COUNTRY + CATEGORY
-    # ============================
+    st.divider()
 
 
-    col1, col2 = st.columns(2)
+
+    # ==========================
+    # COUNTRY REVENUE
+    # ==========================
+
+
+    col1,col2 = st.columns(2)
+
 
 
     with col1:
+
 
         st.subheader(
             "🌎 Revenue by Country"
         )
 
 
-        country_revenue = (
-            df
+        country_sales = (
+
+            orders
+
             .groupby("country")
+
             ["total_amount"]
+
             .sum()
+
             .reset_index()
+
         )
 
 
         fig = px.bar(
-            country_revenue,
+
+            country_sales,
+
             x="country",
+
             y="total_amount"
+
         )
 
 
@@ -254,32 +336,61 @@ def show_executive():
 
 
 
+    # ==========================
+    # CATEGORY REVENUE
+    # ==========================
+
+
     with col2:
+
 
         st.subheader(
             "📦 Revenue by Category"
         )
 
 
-        category_revenue = (
+        category_sales = (
+
             df
+
+            .assign(
+
+                revenue=
+                df["quantity"] *
+                df["price"]
+
+            )
+
             .groupby("category")
-            ["total_amount"]
+
+            ["revenue"]
+
             .sum()
+
             .reset_index()
+
         )
 
 
         fig = px.pie(
-            category_revenue,
+
+            category_sales,
+
             names="category",
-            values="total_amount"
+
+            values="revenue",
+
+            hole=0.45
+
         )
 
 
         st.plotly_chart(
+
             fig,
+
             use_container_width=True
+
         )
 
 
@@ -288,9 +399,61 @@ def show_executive():
 
 
 
-    # ============================
+    # ==========================
+    # STATUS
+    # ==========================
+
+
+    st.subheader(
+        "📦 Order Status Overview"
+    )
+
+
+    status = (
+
+        orders
+
+        .groupby("status")
+
+        ["order_id"]
+
+        .count()
+
+        .reset_index()
+
+    )
+
+
+    fig = px.pie(
+
+        status,
+
+        names="status",
+
+        values="order_id",
+
+        hole=0.45
+
+    )
+
+
+    st.plotly_chart(
+
+        fig,
+
+        use_container_width=True
+
+    )
+
+
+
+    st.divider()
+
+
+
+    # ==========================
     # TOP PRODUCTS
-    # ============================
+    # ==========================
 
 
     st.subheader(
@@ -299,20 +462,44 @@ def show_executive():
 
 
     top_products = (
+
         df
-        .groupby("product_name")
-        ["total_amount"]
+
+        .assign(
+
+            revenue=
+            df["quantity"] *
+            df["price"]
+
+        )
+
+        .groupby(
+            [
+                "product_name",
+                "category"
+            ]
+        )
+
+        ["revenue"]
+
         .sum()
+
         .reset_index()
+
         .sort_values(
-            by="total_amount",
+            "revenue",
             ascending=False
         )
+
         .head(10)
+
     )
 
 
     st.dataframe(
+
         top_products,
+
         use_container_width=True
+
     )
