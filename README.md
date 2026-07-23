@@ -49,7 +49,6 @@ The platform enables businesses to analyze:
 - GitHub
 
 ---
-
 ## 📊 Dashboard Screenshots
 
 ### Executive Dashboard
@@ -57,6 +56,7 @@ The platform enables businesses to analyze:
 ![Executive Dashboard](screenshots/executive_dashboard.png)
 
 Provides high-level business KPIs including:
+
 - Total Revenue
 - Total Orders
 - Average Order Value
@@ -69,6 +69,7 @@ Provides high-level business KPIs including:
 ![Sales Dashboard](screenshots/sales_dashboard.png)
 
 Analyzes:
+
 - Revenue trends over time
 - Sales performance
 - Geographic revenue distribution
@@ -80,6 +81,7 @@ Analyzes:
 ![Product Dashboard](screenshots/product_dashboard.png)
 
 Provides insights into:
+
 - Product performance
 - Category-level revenue analysis
 - Top-performing products
@@ -91,11 +93,11 @@ Provides insights into:
 ![Customer Dashboard](screenshots/customer_dashboard.png)
 
 Analyzes:
+
 - Customer purchasing behavior
 - Customer segmentation
 - VIP customers
 - High-value customer analysis
-
 
 ---
 
